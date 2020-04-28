@@ -38,34 +38,22 @@ def quad_2n(goal):
 
     for row in range(width):
         for col in range(width):
-            pos = col % 2
 
-            if goal[row, col]:
-                if row == 0:
-                    if col == 0:           new_cells[row, col] = SquareCell(pre['on_tl'], pos)
-                    elif col == width - 1: new_cells[row, col] = SquareCell(pre['on_tr'], pos)
-                    else:                  new_cells[row, col] = SquareCell(pre['on_t'], pos)
-                elif row == width - 1:
-                    if col == 0:           new_cells[row, col] = SquareCell(pre['on_dl'], pos)
-                    elif col == width - 1: new_cells[row, col] = SquareCell(pre['on_dr'], pos)
-                    else:                  new_cells[row, col] = SquareCell(pre['on_d'], pos)
-                else:
-                    if col == 0:           new_cells[row, col] = SquareCell(pre['on_l'], pos)
-                    elif col == width - 1: new_cells[row, col] = SquareCell(pre['on_r'], pos)
-                    else:                  new_cells[row, col] = SquareCell(pre['on'], pos)
+            pos = col % 2
+            status = ['off', 'on'][goal[row, col]]
+
+            if row == 0:
+                if col == 0:           new_cells[row, col] = SquareCell(pre[status + '_tl'], pos)
+                elif col == width - 1: new_cells[row, col] = SquareCell(pre[status + '_tr'], pos)
+                else:                  new_cells[row, col] = SquareCell(pre[status + '_t'], pos)
+            elif row == width - 1:
+                if col == 0:           new_cells[row, col] = SquareCell(pre[status + '_dl'], pos)
+                elif col == width - 1: new_cells[row, col] = SquareCell(pre[status + '_dr'], pos)
+                else:                  new_cells[row, col] = SquareCell(pre[status + '_d'], pos)
             else:
-                if row == 0:
-                    if col == 0:           new_cells[row, col] = SquareCell(pre['off_tl'], pos)
-                    elif col == width - 1: new_cells[row, col] = SquareCell(pre['off_tr'], pos)
-                    else:                  new_cells[row, col] = SquareCell(pre['off_t'], pos)
-                elif row == width - 1:
-                    if col == 0:           new_cells[row, col] = SquareCell(pre['off_dl'], pos)
-                    elif col == width - 1: new_cells[row, col] = SquareCell(pre['off_dr'], pos)
-                    else:                  new_cells[row, col] = SquareCell(pre['off_d'], pos)
-                else:
-                    if col == 0:           new_cells[row, col] = SquareCell(pre['off_l'], pos)
-                    elif col == width - 1: new_cells[row, col] = SquareCell(pre['off_r'], pos)
-                    else:                  new_cells[row, col] = SquareCell(pre['off'], pos)
+                if col == 0:           new_cells[row, col] = SquareCell(pre[status + '_l'], pos)
+                elif col == width - 1: new_cells[row, col] = SquareCell(pre[status + '_r'], pos)
+                else:                  new_cells[row, col] = SquareCell(pre[status], pos)
 
 
     # main merging loop of SquareCells

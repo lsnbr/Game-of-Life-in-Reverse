@@ -36,7 +36,7 @@ def print_life(*lifes: (np.ndarray), title: str = 'Great pattern') -> None:
             print(' '.join(map(lambda c: ['.', 'O'][c], r)))
     else:
         for i, life in enumerate(lifes):
-            print(title, i)
+            print(title, i + 1)
             for r in life:
                 print(' '.join(map(lambda c: ['.', 'O'][c], r)))
             if i < len(lifes) - 1:
