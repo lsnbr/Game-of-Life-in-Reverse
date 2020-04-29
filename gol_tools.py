@@ -140,7 +140,14 @@ def map2d(fun, mat: np.ndarray, n_type = None) -> np.ndarray:
 
 
 
+def test_if_pre(preds: [np.ndarray], goal: np.ndarray) -> int:
 
+    c = 0
+    goal = pad(goal)
+    for p in preds:
+        if not np.array_equal(next_gen(p), goal):
+            c += 1
+    return c
 
 
 

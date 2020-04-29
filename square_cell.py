@@ -48,7 +48,7 @@ def merge(pos: int, kind: str, c1: SquareCell, c2: SquareCell, c3: SquareCell = 
 
     if kind == 'vertical':
         pairs = []
-        for top_cell in c1:
+        for top_cell in c1.pats:
             h = down2(top_cell).tostring()
             if h in c2.hashs:
                 for down_cell in c2.hashs[h]:

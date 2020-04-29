@@ -6,7 +6,7 @@ from square_tree import SquareTree
 
 
 
-def quad_gen(goal: np.ndarray) -> np.ndarray:
+def quad_gen(goal: np.ndarray) -> [np.ndarray]:
 
     tree = SquareTree(goal.shape)
     height, width = goal.shape
@@ -14,7 +14,7 @@ def quad_gen(goal: np.ndarray) -> np.ndarray:
     pre = singleCellPredecessorsStrict()
 
 
-    def tree_merge(twig: SquareTree, cord: (int, int), pos: int) -> [SquareCell]:
+    def tree_merge(twig: SquareTree, cord: (int, int), pos: int) -> SquareCell:
         
         if twig.type == 'leaf':
             status = ['off', 'on'][goal[cord]]
@@ -22,7 +22,7 @@ def quad_gen(goal: np.ndarray) -> np.ndarray:
                 if cord[1] == 0:           return SquareCell(pre[status + '_tl'], pos)
                 elif cord[1] == width - 1: return SquareCell(pre[status + '_tr'], pos)
                 else:                      return SquareCell(pre[status + '_t'], pos)
-            elif cord[0] == width - 1:
+            elif cord[0] == height - 1:
                 if cord[1] == 0:           return SquareCell(pre[status + '_dl'], pos)
                 elif cord[1] == width - 1: return SquareCell(pre[status + '_dr'], pos)
                 else:                      return SquareCell(pre[status + '_d'], pos)
