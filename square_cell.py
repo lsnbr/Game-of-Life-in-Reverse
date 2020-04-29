@@ -37,7 +37,7 @@ class SquareCell:
 
 
 def merge_quad(tl: SquareCell, tr: SquareCell, dl: SquareCell, dr: SquareCell, pos: int) -> SquareCell:
-    '''takes 4 SquareCell objects and creates a new one out of all possible fitting combinations'''
+    '''takes 4 SquareCell objects and creates a new one out of all possible combinations'''
 
     tops = []
     downs = []
