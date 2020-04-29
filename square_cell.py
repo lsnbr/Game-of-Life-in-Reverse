@@ -47,40 +47,35 @@ def merge(pos: int, kind: str, c1: SquareCell, c2: SquareCell, c3: SquareCell = 
     '''
 
     if kind == 'vertical':
-        pairs = []
-        for top_cell in c1.pats:
-            h = down2(top_cell).tostring()
+        tops, downs = c1.pats, c2
+    else:
+        # tops
+        tops = []
+        for left_cell in c1.pats:
+            h = right2(left_cell).tostring()
             if h in c2.hashs:
-                for down_cell in c2.hashs[h]:
-                    pairs.append(merge_halves_vertical(top_cell, down_cell))
-        return SquareCell(pairs, pos)
+                for reight_cell in c2.hashs[h]:
+                    tops.append(merge_halves_horizontal(left_cell, reight_cell))
+        if kind == 'horizontal': return SquareCell(tops, pos)
+        
+        # downs
+        downs = []
+        for left_cell in c3.pats:
+            h = right2(left_cell).tostring()
+            if h in c4.hashs:
+                for reight_cell in c4.hashs[h]:
+                    downs.append(merge_halves_horizontal(left_cell, reight_cell))
+        downs = SquareCell(downs, 2)
 
-    # tops
-    tops = []
-    for left_cell in c1.pats:
-        h = right2(left_cell).tostring()
-        if h in c2.hashs:
-            for reight_cell in c2.hashs[h]:
-                tops.append(merge_halves_horizontal(left_cell, reight_cell))
-    if kind == 'horizontal': return SquareCell(tops, pos)
 
-    # downs
-    downs = []
-    for left_cell in c3.pats:
-        h = right2(left_cell).tostring()
-        if h in c4.hashs:
-            for reight_cell in c4.hashs[h]:
-                downs.append(merge_halves_horizontal(left_cell, reight_cell))
-    downs = SquareCell(downs, 2)
-
-    # quads
+    # quads or vertical
     quads = []
     for top_cell in tops:
         h = down2(top_cell).tostring()
         if h in downs.hashs:
             for down_cell in downs.hashs[h]:
                 quads.append(merge_halves_vertical(top_cell, down_cell))
-    if kind == 'quad': return SquareCell(quads, pos)
+    return SquareCell(quads, pos)
 
 
 
