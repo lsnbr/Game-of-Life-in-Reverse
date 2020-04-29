@@ -1,7 +1,7 @@
 import numpy as np
 
 from gol_tools import *
-from square_cell import SquareCell, merge_quad
+from square_cell import SquareCell, merge
 
 
 
@@ -68,9 +68,9 @@ def quad_2n(goal):
             oldRow = row * 2
             for col in range(width):
                 oldCol = col * 2
-                new_cells[row, col] = merge_quad(old_cells[oldRow    , oldCol], old_cells[oldRow    , oldCol + 1] 
-                                                ,old_cells[oldRow + 1, oldCol], old_cells[oldRow + 1, oldCol + 1] 
-                                                ,col % 2)
+                new_cells[row, col] = merge(col % 2, 'quad'
+                                           ,old_cells[oldRow    , oldCol], old_cells[oldRow    , oldCol + 1] 
+                                           ,old_cells[oldRow + 1, oldCol], old_cells[oldRow + 1, oldCol + 1])
 
     return new_cells[0, 0].pats
 

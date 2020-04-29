@@ -2,13 +2,16 @@ import numpy as np
 
 from gol_tools import *
 from quad_2n import quad_2n
+from quad_gen import quad_gen
 
 
 
 goal8 = np.array(list(bin(31 ** 13)[3:]), dtype = np.int8).reshape(8,8)
-goal = create_rnd((8,8), 0.8)
+goal_rnd = create_rnd((4,8), 0.6)
+goal = goal_rnd
 
-pred = quad_2n(goal)
+pred = quad_gen(goal)
+#pred = quad_2n(goal)
 
 print_life(goal, title='Goal pattern')
 print_life(pred[0], title=f'{len(pred)} predecessors')

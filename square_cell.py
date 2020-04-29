@@ -11,7 +11,9 @@ class SquareCell:
     def __init__(self, pats: [np.ndarray], pos: int) -> None :
         '''
         constructs a hash table with the left/top rim as keys
-        pos = position in its 2x2 square: 0 is left, 1 is right, 2 is down
+                                               3
+        pos = position in its 2x2 square:    0   1
+                                               2
         '''
 
         self.hashs = {}
@@ -36,36 +38,49 @@ class SquareCell:
 
 
 
-def merge_quad(tl: SquareCell, tr: SquareCell, dl: SquareCell, dr: SquareCell, pos: int) -> SquareCell:
-    '''takes 4 SquareCell objects and creates a new one out of all possible combinations'''
+def merge(pos: int, kind: str, c1: SquareCell, c2: SquareCell, c3: SquareCell = None, c4: SquareCell = None) -> SquareCell:
+    '''
+    takes 2 or 4 SquareCell objects and creates a new one out of all possible combinations
+    
+    kinds:    'vertical':  c1      'horizontal':  c1 c2      'quad':  c1 c2
+                           c2                                         c3 c4
+    '''
 
-    tops = []
-    downs = []
-    quads = []
+    if kind == 'vertical':
+        pairs = []
+        for top_cell in c1:
+            h = down2(top_cell).tostring()
+            if h in c2.hashs:
+                for down_cell in c2.hashs[h]:
+                    pairs.append(merge_halves_vertical(top_cell, down_cell))
+        return SquareCell(pairs, pos)
 
     # tops
-    for left_cell in tl.pats:
+    tops = []
+    for left_cell in c1.pats:
         h = right2(left_cell).tostring()
-        if h in tr.hashs:
-            for reight_cell in tr.hashs[h]:
+        if h in c2.hashs:
+            for reight_cell in c2.hashs[h]:
                 tops.append(merge_halves_horizontal(left_cell, reight_cell))
+    if kind == 'horizontal': return SquareCell(tops, pos)
 
     # downs
-    for left_cell in dl.pats:
+    downs = []
+    for left_cell in c3.pats:
         h = right2(left_cell).tostring()
-        if h in dr.hashs:
-            for reight_cell in dr.hashs[h]:
+        if h in c4.hashs:
+            for reight_cell in c4.hashs[h]:
                 downs.append(merge_halves_horizontal(left_cell, reight_cell))
     downs = SquareCell(downs, 2)
 
     # quads
+    quads = []
     for top_cell in tops:
         h = down2(top_cell).tostring()
         if h in downs.hashs:
             for down_cell in downs.hashs[h]:
                 quads.append(merge_halves_vertical(top_cell, down_cell))
-
-    return SquareCell(quads, pos)
+    if kind == 'quad': return SquareCell(quads, pos)
 
 
 
