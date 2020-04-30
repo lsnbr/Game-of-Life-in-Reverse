@@ -87,12 +87,12 @@ def singleCellPredecessorsStrict():
                 if not (pat1[1, 0] or pat1[2, 0]):
                     pre_top_left_off.append(pat0)
 
-    return {'on': pre_on, 'on_t': pre_top_on, 'on_tl': pre_top_left_on
-           ,'off': pre_off, 'off_t': pre_top_off, 'off_tl': pre_top_left_off
-           ,'on_d': rot_twice(pre_top_on), 'on_l': rot_counter(pre_top_on), 'on_r': rot_clock(pre_top_on)
-           ,'off_d': rot_twice(pre_top_off), 'off_l': rot_counter(pre_top_off), 'off_r': rot_clock(pre_top_off)
-           ,'on_tr': rot_clock(pre_top_left_on), 'on_dr': rot_twice(pre_top_left_on), 'on_dl': rot_counter(pre_top_left_on)
-           ,'off_tr': rot_clock(pre_top_left_off), 'off_dr': rot_twice(pre_top_left_off), 'off_dl': rot_counter(pre_top_left_off)}
+    return {'on': pre_on, 'ont': pre_top_on, 'ontl': pre_top_left_on
+           ,'off': pre_off, 'offt': pre_top_off, 'offtl': pre_top_left_off
+           ,'ond': rot_twice(pre_top_on), 'onl': rot_counter(pre_top_on), 'onr': rot_clock(pre_top_on)
+           ,'offd': rot_twice(pre_top_off), 'offl': rot_counter(pre_top_off), 'offr': rot_clock(pre_top_off)
+           ,'ontr': rot_clock(pre_top_left_on), 'ondr': rot_twice(pre_top_left_on), 'ondl': rot_counter(pre_top_left_on)
+           ,'offtr': rot_clock(pre_top_left_off), 'offdr': rot_twice(pre_top_left_off), 'offdl': rot_counter(pre_top_left_off)}
 
 
 

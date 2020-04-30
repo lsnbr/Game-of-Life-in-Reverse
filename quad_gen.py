@@ -18,18 +18,9 @@ def quad_gen(goal):
         
         if twig.type == 'leaf':
             status = ['off', 'on'][goal[cord]]
-            if cord[0] == 0:
-                if cord[1] == 0:           return SquareCell(pre[status + '_tl'], pos)
-                elif cord[1] == width - 1: return SquareCell(pre[status + '_tr'], pos)
-                else:                      return SquareCell(pre[status + '_t'], pos)
-            elif cord[0] == height - 1:
-                if cord[1] == 0:           return SquareCell(pre[status + '_dl'], pos)
-                elif cord[1] == width - 1: return SquareCell(pre[status + '_dr'], pos)
-                else:                      return SquareCell(pre[status + '_d'], pos)
-            else:
-                if cord[1] == 0:           return SquareCell(pre[status + '_l'], pos)
-                elif cord[1] == width - 1: return SquareCell(pre[status + '_r'], pos)
-                else:                      return SquareCell(pre[status], pos)
+            row_pos = 't' if cord[0] == 0 else ('d' if cord[0] == height - 1 else '')
+            col_pos = 'l' if cord[1] == 0 else ('r' if cord[1] == width - 1 else '')
+            return SquareCell(pre[status + row_pos + col_pos], pos)
 
         off_height, off_width = twig.tl.shape
 
@@ -38,18 +29,15 @@ def quad_gen(goal):
             down = tree_merge(twig.dl, (cord[0] + off_height, cord[1]), 2)
             return SquareCell.merge(pos, 'vertical', top, down)
 
+        top_left = tree_merge(twig.tl, cord, 0)
+        top_right = tree_merge(twig.tr, (cord[0], cord[1] + off_width), 1)
         if twig.type == 'horizontal':
-            left = tree_merge(twig.tl, cord, 0)
-            right = tree_merge(twig.tr, (cord[0], cord[1] + off_width), 1)
-            return SquareCell.merge(pos, 'horizontal', left, right)
-
-        else:
-            top_left = tree_merge(twig.tl, cord, 0)
-            top_right = tree_merge(twig.tr, (cord[0], cord[1] + off_width), 1)
-            down_left = tree_merge(twig.dl, (cord[0] + off_height, cord[1]), 0)
-            down_right = tree_merge(twig.dr, (cord[0] + off_height, cord[1] + off_width), 1)
-            return SquareCell.merge(pos, 'quad', top_left, top_right, down_left, down_right)
-
+            return SquareCell.merge(pos, 'horizontal', top_left, top_right)
+        
+        down_left = tree_merge(twig.dl, (cord[0] + off_height, cord[1]), 0)
+        down_right = tree_merge(twig.dr, (cord[0] + off_height, cord[1] + off_width), 1)
+        return SquareCell.merge(pos, 'quad', top_left, top_right, down_left, down_right)
+        
 
     result = tree_merge(tree, (0, 0), 0)
     return result.pats

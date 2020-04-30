@@ -31,29 +31,16 @@ def quad_2n(goal):
     pre = singleCellPredecessorsStrict()
 
 
-
     # initialize first newCell[,]
     print(f'Level {log_two}...')
 
     for row in range(width):
         for col in range(width):
-
             pos = col % 2
             status = ['off', 'on'][goal[row, col]]
-
-            if row == 0:
-                if col == 0:           new_cells[row, col] = SquareCell(pre[status + '_tl'], pos)
-                elif col == width - 1: new_cells[row, col] = SquareCell(pre[status + '_tr'], pos)
-                else:                  new_cells[row, col] = SquareCell(pre[status + '_t'], pos)
-            elif row == width - 1:
-                if col == 0:           new_cells[row, col] = SquareCell(pre[status + '_dl'], pos)
-                elif col == width - 1: new_cells[row, col] = SquareCell(pre[status + '_dr'], pos)
-                else:                  new_cells[row, col] = SquareCell(pre[status + '_d'], pos)
-            else:
-                if col == 0:           new_cells[row, col] = SquareCell(pre[status + '_l'], pos)
-                elif col == width - 1: new_cells[row, col] = SquareCell(pre[status + '_r'], pos)
-                else:                  new_cells[row, col] = SquareCell(pre[status], pos)
-
+            row_pos = 't' if row == 0 else ('d' if row == width - 1 else '')
+            col_pos = 'l' if col == 0 else ('r' if col == width - 1 else '')
+            new_cells[row, col] = SquareCell(pre[status + row_pos + col_pos], pos)
 
     # main merging loop of SquareCells
     for level in range(log_two - 1, -1, -1):
