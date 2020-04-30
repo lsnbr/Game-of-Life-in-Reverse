@@ -1,7 +1,7 @@
 import numpy as np
 
 from gol_tools import *
-from square_cell import SquareCell, merge
+from square_cell import SquareCell
 
 
 
@@ -26,7 +26,6 @@ def quad_2n(goal):
     log_two = len(bin(width)) - 3   # log base 2 of side length
 
     new_cells = np.ndarray(shape=(width, width), dtype=SquareCell)
-    old_cells = None
 
     # dict of all kid of 3x3 predecessors of a single on/off cell
     pre = singleCellPredecessorsStrict()
@@ -68,9 +67,10 @@ def quad_2n(goal):
             oldRow = row * 2
             for col in range(width):
                 oldCol = col * 2
-                new_cells[row, col] = merge(col % 2, 'quad'
-                                           ,old_cells[oldRow    , oldCol], old_cells[oldRow    , oldCol + 1] 
-                                           ,old_cells[oldRow + 1, oldCol], old_cells[oldRow + 1, oldCol + 1])
+                new_cells[row, col] = SquareCell.merge(
+                                            col % 2, 'quad',
+                                            old_cells[oldRow    , oldCol], old_cells[oldRow    , oldCol + 1],
+                                            old_cells[oldRow + 1, oldCol], old_cells[oldRow + 1, oldCol + 1])
 
     return new_cells[0, 0].pats
 

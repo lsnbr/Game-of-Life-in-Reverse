@@ -1,6 +1,7 @@
 class SquareTree:
     '''Represents partition of rectangle into as much 2^n by 2^n squares as possible'''
 
+
     def __init__(self, shape):
         '''
         shape = (height, width)

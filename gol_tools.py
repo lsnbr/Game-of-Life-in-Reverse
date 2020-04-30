@@ -7,7 +7,7 @@ from random import random
 
 
 
-def create_rnd(size: (int, int), density: float = 0.5) -> np.ndarray:
+def create_rnd(size, density = 0.5):
 
     return np.array([[1 if random() < density else 0 for _ in range(size[1])] for _ in range(size[0])]
                     ,dtype = np.int8)
@@ -16,7 +16,7 @@ def create_rnd(size: (int, int), density: float = 0.5) -> np.ndarray:
 
 
 
-def pad(life: np.ndarray) -> np.ndarray:
+def pad(life):
 
     zrow = np.zeros(life.shape[1] + 2, dtype=np.int8)
     zcol = np.zeros(life.shape[0], dtype=np.int8)
@@ -27,7 +27,7 @@ def pad(life: np.ndarray) -> np.ndarray:
 
 
 
-def print_life(*lifes: (np.ndarray), title: str = 'Great pattern') -> None:
+def print_life(*lifes, title = 'Great pattern'):
     
     print()
     if len(lifes) == 1:
@@ -45,7 +45,7 @@ def print_life(*lifes: (np.ndarray), title: str = 'Great pattern') -> None:
 
 
 
-def next_gen(oldL: np.ndarray) -> np.ndarray:
+def next_gen(oldL):
 
     newL = np.zeros(oldL.shape, dtype=np.int8)
     oldL = pad(oldL)
@@ -60,7 +60,7 @@ def next_gen(oldL: np.ndarray) -> np.ndarray:
 
 
 
-def singleCellPredecessorsStrict() -> {str: [np.ndarray]}:
+def singleCellPredecessorsStrict():
 
     pre_on = []
     pre_off = []
@@ -110,7 +110,10 @@ def rot_clock(pats):
 def rot_twice(pats):
     return list(map(lambda a: np.rot90(a, 2).copy(), pats))
 
-
+def merge_halves_horizontal(le, re):
+    return np.hstack((le[:, :-1], re[:, 1:]))
+def merge_halves_vertical(up, do):
+    return np.vstack((up[:-1, :], do[1:, :]))
 
 def right2(grid):
     return grid[:, -2:]
@@ -120,14 +123,13 @@ def top2(grid):
     return grid[:2, :]
 def down2(grid):
     return grid[-2:, :]
-
 def mid(grid):
     return grid[2:-2, 2:-2]
 
 
 
 
-def map2d(fun, mat: np.ndarray, n_type = None) -> np.ndarray:
+def map2d(fun, mat, n_type = None):
 
     if n_type:
         n_mat = np.ndarray(mat.shape, n_type)
@@ -140,7 +142,7 @@ def map2d(fun, mat: np.ndarray, n_type = None) -> np.ndarray:
 
 
 
-def test_if_pre(preds: [np.ndarray], goal: np.ndarray) -> int:
+def test_if_pre(preds, goal):
 
     c = 0
     goal = pad(goal)
@@ -155,7 +157,7 @@ def test_if_pre(preds: [np.ndarray], goal: np.ndarray) -> int:
 
 
 
-def run_gens(life: np.ndarray, gens: int, print_final: bool = False, print_all: bool = False) -> np.ndarray:
+def run_gens(life, gens, print_final = False, print_all = False):
 
     for _ in range(gens):
         if print_all: print_life(life)
@@ -167,7 +169,7 @@ def run_gens(life: np.ndarray, gens: int, print_final: bool = False, print_all: 
 
 
 
-def singleCellPredecessors() -> ([np.ndarray], [np.ndarray]):
+def singleCellPredecessors():
 
     #ind_on, ind_off = 0, 0
     pred0, pred1 = [], []
@@ -185,7 +187,7 @@ def singleCellPredecessors() -> ([np.ndarray], [np.ndarray]):
 
 
 
-def avg_density(size: (int, int), density: float, n_gens: int, tries: int = 10) -> (float, float, float):
+def avg_density(size, density, n_gens, tries = 10):
     '''return (avg_density, lowest_density, highest_density)'''
 
     total_cells = size[0] * size[1]
