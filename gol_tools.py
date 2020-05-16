@@ -5,18 +5,16 @@ from random import random
 
 
 
-
-
 def create_rnd(size, density = 0.5):
+    '''create a size[0] by size[1] pattern with given density of live cells'''
 
     return np.array([[1 if random() < density else 0 for _ in range(size[1])] for _ in range(size[0])]
                     ,dtype = np.int8)
 
 
 
-
-
 def pad(life):
+    '''surround a pattern with a 1 thick layer of dead cells'''
 
     zrow = np.zeros(life.shape[1] + 2, dtype=np.int8)
     zcol = np.zeros(life.shape[0], dtype=np.int8)
@@ -26,17 +24,17 @@ def pad(life):
 
 
 
-
-def print_life(*lifes, title = 'Great pattern'):
+def print_life(*lifes, title = None):
+    '''print a pattern where 'O'=alive and '.'=dead'''
     
     print()
     if len(lifes) == 1:
-        print(title)
+        if title is not None: print(title)
         for r in lifes[0]:
             print(' '.join(map(lambda c: ['.', 'O'][c], r)))
     else:
         for i, life in enumerate(lifes):
-            print(title, i + 1)
+            if title is not None: print(title, i + 1)
             for r in life:
                 print(' '.join(map(lambda c: ['.', 'O'][c], r)))
             if i < len(lifes) - 1:
@@ -44,8 +42,8 @@ def print_life(*lifes, title = 'Great pattern'):
 
 
 
-
 def next_gen(oldL):
+    '''compute the GoL successor function with fixed size (rimcells have fewer neighbors)'''
 
     newL = np.zeros(oldL.shape, dtype=np.int8)
     oldL = pad(oldL)
@@ -58,9 +56,8 @@ def next_gen(oldL):
 
 
 
-
-
 def singleCellPredecessorsStrict():
+    '''compute all kind of predecessors of a single cell'''
 
     pre_on = []
     pre_off = []
@@ -96,7 +93,6 @@ def singleCellPredecessorsStrict():
 
 
 
-
 def flip_row(pats):
     return list(map(np.flipud, pats))
 def flip_col(pats):
@@ -128,8 +124,8 @@ def mid(grid):
 
 
 
-
 def map2d(fun, mat, n_type = None):
+    '''like the built in map function, just for np 2d arrays'''
 
     if n_type:
         n_mat = np.ndarray(mat.shape, n_type)
@@ -143,21 +139,19 @@ def map2d(fun, mat, n_type = None):
 
 
 def test_if_pre(preds, goal):
+    '''test if all pattern in preds are predecessors of goal'''
 
     c = 0
     goal = pad(goal)
-    for p in preds:
+    for p in [preds] if isinstance(preds, np.ndarray) else preds:
         if not np.array_equal(next_gen(p), goal):
             c += 1
     return c
 
 
 
-
-
-
-
 def run_gens(life, gens, print_final = False, print_all = False):
+    '''compute a future generation'''
 
     for _ in range(gens):
         if print_all: print_life(life)
@@ -167,37 +161,17 @@ def run_gens(life, gens, print_final = False, print_all = False):
 
 
 
-
-
-def singleCellPredecessors():
-
-    #ind_on, ind_off = 0, 0
-    pred0, pred1 = [], []
-
-    for i in range(512, 1024):
-        pattern = np.array(list(bin(i)[3:]), dtype=np.int8).reshape(3,3)
-        if next_gen(pattern)[1, 1] == 1:
-            pred1.append(pattern)
-        else:
-            pred0.append(pattern)
-
-    return pred0, pred1
-
-
-
-
-
-def avg_density(size, density, n_gens, tries = 10):
+def avg_density(size, density, n_gens, sample_size = 32):
     '''return (avg_density, lowest_density, highest_density)'''
 
     total_cells = size[0] * size[1]
     total = 0
     lowest = total_cells
     highest = 0
-    for _ in range(tries):
+    for _ in range(sample_size):
         end_pat = run_gens(create_rnd(size, density), n_gens, print_final=False)
         on_cells = end_pat.sum()
         total += on_cells
         if on_cells < lowest: lowest = on_cells
         elif on_cells > highest: highest = on_cells
-    return total / (total_cells * tries), lowest / total_cells, highest / total_cells
+    return total / (total_cells * sample_size), lowest / total_cells, highest / total_cells

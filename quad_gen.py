@@ -7,14 +7,18 @@ from square_tree import SquareTree
 
 
 def quad_gen(goal):
+    '''generalized verion of quad_2n()'''
 
+    # tree structure of pattern to merge
     tree = SquareTree(goal.shape)
+    # general dimensions of input pattern
     height, width = goal.shape
     # dict of all kid of 3x3 predecessors of a single on/off cell
     pre = singleCellPredecessorsStrict()
 
 
     def tree_merge(twig, cord, pos):
+        '''recursive merging according to tree structure of rectangles'''
         
         if twig.type == 'leaf':
             status = ['off', 'on'][goal[cord]]

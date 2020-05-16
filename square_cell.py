@@ -6,12 +6,12 @@ from gol_tools import *
 
 
 class SquareCell:
-    '''Represents a 2^n by 2^2 cell'''
+    '''Represents a rectangular cell'''
 
 
     def __init__(self, pats, pos):
         '''
-        constructs a hash table with the left/top rim as keys
+        constructs a hash table => {left/top rim: corresponding pattern}
                                                3
         pos = position in its 2x2 square:    0   1
                                                2
@@ -37,8 +37,8 @@ class SquareCell:
 
 
 
-    @classmethod
-    def merge(cls, pos, kind, c1, c2, c3 = None, c4 = None):
+    @staticmethod
+    def merge(pos, kind, c1, c2, c3 = None, c4 = None):
         '''
         takes 2 or 4 SquareCell objects and creates a new one out of all possible combinations
         
@@ -56,7 +56,7 @@ class SquareCell:
                 if h in c2.hashs:
                     for reight_cell in c2.hashs[h]:
                         tops.append(merge_halves_horizontal(left_cell, reight_cell))
-            if kind == 'horizontal': return cls(tops, pos)
+            if kind == 'horizontal': return SquareCell(tops, pos)
             
             # downs
             downs = []
@@ -65,7 +65,7 @@ class SquareCell:
                 if h in c4.hashs:
                     for reight_cell in c4.hashs[h]:
                         downs.append(merge_halves_horizontal(left_cell, reight_cell))
-            downs = cls(downs, 2)
+            downs = SquareCell(downs, 2)
 
         # quads or vertical
         quads = []
@@ -74,4 +74,4 @@ class SquareCell:
             if h in downs.hashs:
                 for down_cell in downs.hashs[h]:
                     quads.append(merge_halves_vertical(top_cell, down_cell))
-        return cls(quads, pos)
+        return SquareCell(quads, pos)
