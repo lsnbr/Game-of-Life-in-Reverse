@@ -8,8 +8,10 @@ from random import random
 def create_rnd(size, density = 0.5):
     '''create a size[0] by size[1] pattern with given density of live cells'''
 
-    return np.array([[1 if random() < density else 0 for _ in range(size[1])] for _ in range(size[0])]
-                    ,dtype = np.int8)
+    return np.array(
+        [[1 if random() < density else 0 for _ in range(size[1])] for _ in range(size[0])],
+        dtype = np.int8
+    )
 
 
 
