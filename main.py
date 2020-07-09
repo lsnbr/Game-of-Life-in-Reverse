@@ -1,47 +1,73 @@
-from gol_tools import create_rnd, next_gen
-
+import gol_tools as gol
 import tkinter as tk
 
 
-def update_gol(new_life=None):
-    global life
-    life = next_gen(life) if new_life is None else new_life
-    for r in range(life.shape[0]):
-        for c in range(life.shape[1]):
-            tk.Frame(
-                master=frame_gol,
-                bg=['black', 'white'][life[r, c]],
-            ).grid(row=r, column=c, sticky='nswe')
-
-def loop_gol():
-    update_gol()
-    window.after(200, loop_gol)
 
 
-window = tk.Tk()
-window.title('Game of Life in Reverse')
-size = (20, 20)
+class GoLApp:
 
-btn_nextgen = tk.Button(
-    master=window,
-    text='Next Gen',
-    command=update_gol,
-)
-btn_nextgen.pack(fill=tk.BOTH, expand=True)
-btn_startloop = tk.Button(
-    master=window,
-    text='Start Loop',
-    command=loop_gol,
-)
-btn_startloop.pack(fill=tk.BOTH, expand=True)
+    def __init__(self):
+        self.width, self.height = 512, 512
+        self.life = None
+        self.is_in_loop = False
+        self.app = tk.Tk()
+        self.app.title('Game of Life in Reverse')
 
-frame_gol = tk.Frame(
-    master=window,
-)
-frame_gol.rowconfigure(list(range(size[0])), weight=1, minsize=32)
-frame_gol.columnconfigure(list(range(size[1])), weight=1, minsize=32)
-frame_gol.pack(fill=tk.BOTH, expand=True)
-update_gol(create_rnd(size, density=0.3))
+        self.btn_nextgen = tk.Button(
+            master=self.app,
+            text='Next Gen',
+            command=self.update_life,
+            pady=5, padx=5,
+        )
+        self.btn_looplife = tk.Button(
+            master=self.app,
+            text='Start Loop',
+            command=self.control_loop_life,
+            pady=5, padx=5,
+        )
+        self.btn_nextgen.grid(row=0, column=0, sticky='we')
+        self.btn_looplife.grid(row=0, column=1, sticky='we')
+
+        self.cnv_life = tk.Canvas(
+            master=self.app,
+            width=self.width,
+            height=self.height,
+        )
+        self.cnv_life.grid(row=1, column=0, columnspan=2)
+
+        self.update_life(gol.create_rnd((20,20), 0.3))
+        self.app.mainloop()
 
 
-window.mainloop()
+    def update_life(self, new_life=None):
+        self.life = gol.next_gen(self.life) if new_life is None else new_life
+        rows, cols = self.life.shape
+        cell_width, cell_height = self.width / cols, self.height / rows
+        self.cnv_life.delete(tk.ALL)
+        for r in range(rows):
+            for c in range(cols):
+                self.cnv_life.create_rectangle(
+                    r * cell_width, c * cell_height,
+                    (r+1) * cell_width, (c+1) * cell_height,
+                    fill=['black', 'white'][self.life[r, c]],
+                )
+
+
+    def control_loop_life(self):
+        if not self.is_in_loop:
+            self.is_in_loop = True
+            self.btn_looplife.configure(text='Stop Loop')
+            self.loop_life()
+        else:
+            self.is_in_loop = False
+            self.btn_looplife.configure(text='Start Loop')
+
+
+    def loop_life(self):
+        if self.is_in_loop:
+            self.update_life()
+            self.app.after(100, self.loop_life)
+
+
+
+app = GoLApp()
