@@ -1,7 +1,9 @@
-import numpy as np
+from __future__ import annotations
 
 from gol_tools import *
 
+import numpy as np
+from typing import Iterable, Optional
 
 
 
@@ -9,7 +11,7 @@ class SquareCell:
     '''Represents a rectangular cell'''
 
 
-    def __init__(self, pats, pos):
+    def __init__(self, pats: Iterable[Life], pos: int) -> None:
         '''
         constructs a hash table => {left/top rim: corresponding pattern}
                                                3
@@ -38,12 +40,16 @@ class SquareCell:
 
 
     @staticmethod
-    def merge(pos, kind, c1, c2, c3 = None, c4 = None):
+    def merge(
+        pos: int, kind: str,
+        c1: SquareCell, c2: SquareCell,
+        c3: Optional[SquareCell] = None, c4: Optional[SquareCell] = None
+    ) -> SquareCell:
         '''
         takes 2 or 4 SquareCell objects and creates a new one out of all possible combinations
         
         kinds:    'vertical':  c1      'horizontal':  c1 c2      'quad':  c1 c2
-                            c2                                         c3 c4
+                               c2                                         c3 c4
         '''
 
         if kind == 'vertical':

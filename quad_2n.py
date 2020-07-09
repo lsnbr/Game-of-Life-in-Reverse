@@ -1,12 +1,14 @@
-import numpy as np
-
 from gol_tools import *
 from square_cell import SquareCell
 
+import numpy as np
+
+from typing import List
+Life = np.ndarray
 
 
 
-def quad_2n(goal):
+def quad_2n(goal: Life) -> List[Life]:
     '''
     Finds all predecessors of a given 2^n by 2^n goal pattern
 

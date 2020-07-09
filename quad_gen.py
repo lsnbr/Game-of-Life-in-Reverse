@@ -4,9 +4,11 @@ from gol_tools import *
 from square_cell import SquareCell
 from square_tree import SquareTree
 
+from typing import List
+Life = np.ndarray
 
 
-def quad_gen(goal):
+def quad_gen(goal: Life) -> List[Life]:
     '''generalized verion of quad_2n()'''
 
     # tree structure of pattern to merge

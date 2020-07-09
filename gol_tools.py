@@ -1,11 +1,16 @@
 import numpy as np
 from random import random
 
+from typing import (
+    List, Tuple, Dict,
+    Iterable, Callable,
+    Optional, Any
+)
+Life = np.ndarray
 
 
 
-
-def create_rnd(size, density = 0.5):
+def create_rnd(size: Tuple[int, int], density: float = 0.5) -> Life:
     '''create a size[0] by size[1] pattern with given density of live cells'''
 
     return np.array(
@@ -15,7 +20,7 @@ def create_rnd(size, density = 0.5):
 
 
 
-def pad(life):
+def pad(life: Life) -> Life:
     '''surround a pattern with a 1 thick layer of dead cells'''
 
     zrow = np.zeros(life.shape[1] + 2, dtype=np.int8)
@@ -26,7 +31,7 @@ def pad(life):
 
 
 
-def print_life(*lifes, title = None):
+def print_life(*lifes: Life, title: Optional[str] = None) -> None:
     '''print a pattern where 'O'=alive and '.'=dead'''
     
     print()
@@ -44,7 +49,7 @@ def print_life(*lifes, title = None):
 
 
 
-def next_gen(oldL):
+def next_gen(oldL: Life) -> Life:
     '''compute the GoL successor function with fixed size (rimcells have fewer neighbors)'''
 
     newL = np.zeros(oldL.shape, dtype=np.int8)
@@ -58,7 +63,7 @@ def next_gen(oldL):
 
 
 
-def singleCellPredecessorsStrict():
+def singleCellPredecessorsStrict() -> Dict[str, List[Life]]:
     '''compute all kind of predecessors of a single cell'''
 
     pre_on = []
@@ -95,38 +100,49 @@ def singleCellPredecessorsStrict():
 
 
 
-def flip_row(pats):
+def flip_row(pats: Iterable[Life]) -> List[Life]:
     return list(map(np.flipud, pats))
-def flip_col(pats):
+
+def flip_col(pats: Iterable[Life]) -> List[Life]:
     return list(map(np.fliplr, pats))
-def transpose(pats):
+
+def transpose(pats: Iterable[Life]) -> List[Life]:
     return list(map(lambda a: a.T, pats))
-def rot_counter(pats):
+
+def rot_counter(pats: Iterable[Life]) -> List[Life]:
     return list(map(lambda a: np.rot90(a).copy(), pats))
-def rot_clock(pats):
+
+def rot_clock(pats: Iterable[Life]) -> List[Life]:
     return list(map(lambda a: np.rot90(a, 3).copy(), pats))
-def rot_twice(pats):
+
+def rot_twice(pats: Iterable[Life]) -> List[Life]:
     return list(map(lambda a: np.rot90(a, 2).copy(), pats))
 
-def merge_halves_horizontal(le, re):
+
+def merge_halves_horizontal(le: Life, re: Life) -> Life:
     return np.hstack((le[:, :-1], re[:, 1:]))
-def merge_halves_vertical(up, do):
+
+def merge_halves_vertical(up: Life, do: Life) -> Life:
     return np.vstack((up[:-1, :], do[1:, :]))
 
-def right2(grid):
+def right2(grid: Life) -> Life:
     return grid[:, -2:]
-def left2(grid):
+
+def left2(grid: Life) -> Life:
     return grid[:, :2]
-def top2(grid):
+
+def top2(grid: Life) -> Life:
     return grid[:2, :]
-def down2(grid):
+
+def down2(grid: Life) -> Life:
     return grid[-2:, :]
-def mid(grid):
+
+def mid(grid: Life) -> Life:
     return grid[2:-2, 2:-2]
 
 
 
-def map2d(fun, mat, n_type = None):
+def map2d(fun: Callable, mat: Life, n_type: Any = None) -> Life:
     '''like the built in map function, just for np 2d arrays'''
 
     if n_type:
@@ -140,7 +156,7 @@ def map2d(fun, mat, n_type = None):
 
 
 
-def test_if_pre(preds, goal):
+def test_if_pre(preds: List[Life], goal: Life) -> int:
     '''test if all pattern in preds are predecessors of goal'''
 
     c = 0
@@ -152,7 +168,7 @@ def test_if_pre(preds, goal):
 
 
 
-def run_gens(life, gens, print_final = False, print_all = False):
+def run_gens(life: Life, gens: int, print_final: bool = False, print_all: bool = False) -> Life:
     '''compute a future generation'''
 
     for _ in range(gens):
@@ -163,7 +179,10 @@ def run_gens(life, gens, print_final = False, print_all = False):
 
 
 
-def avg_density(size, density, n_gens, sample_size = 32):
+def avg_density(
+    size: Tuple[int, int], density: float,
+    n_gens: int, sample_size: int = 32
+) -> Tuple[float, float, float]:
     '''return (avg_density, lowest_density, highest_density)'''
 
     total_cells = size[0] * size[1]

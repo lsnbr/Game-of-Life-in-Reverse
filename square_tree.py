@@ -1,8 +1,11 @@
+from typing import Tuple
+
+
 class SquareTree:
     '''Represents partition of rectangle into as much 2^n by 2^n squares as possible'''
 
 
-    def __init__(self, shape):
+    def __init__(self, shape: Tuple[int, int]) -> None:
         '''
         shape = (height, width)
         type = 'leaf' | 'quad' | 'vertical' | 'horizontal'
@@ -60,7 +63,7 @@ class SquareTree:
 
 
 
-    def to_str(self, depth=0):
+    def to_str(self, depth: int = 0) -> str:
 
         pad = ' ' * depth
         nd = depth + 1
@@ -74,5 +77,5 @@ class SquareTree:
             return pad + f'\n{pad}'.join((str(self.shape), self.tl.to_str(nd), self.tr.to_str(nd)))
 
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self.to_str()
