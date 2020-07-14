@@ -30,7 +30,7 @@ def quad_2n(goal: Life) -> List[Life]:
     new_cells = np.ndarray(shape=(width, width), dtype=SquareCell)
 
     # dict of all kid of 3x3 predecessors of a single on/off cell
-    pre = singleCellPredecessorsStrict()
+    pre = single_cell_predecessors()
 
 
     # initialize first newCell[,]

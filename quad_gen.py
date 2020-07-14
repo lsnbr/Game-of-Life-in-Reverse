@@ -16,7 +16,7 @@ def quad_gen(goal: Life) -> List[Life]:
     # general dimensions of input pattern
     height, width = goal.shape
     # dict of all kid of 3x3 predecessors of a single on/off cell
-    pre = singleCellPredecessorsStrict()
+    pre = single_cell_predecessors()
 
 
     def tree_merge(twig, cord, pos):

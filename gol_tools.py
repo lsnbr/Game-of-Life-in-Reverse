@@ -25,9 +25,11 @@ def pad(life: Life) -> Life:
 
     zrow = np.zeros(life.shape[1] + 2, dtype=np.int8)
     zcol = np.zeros(life.shape[0], dtype=np.int8)
-    return np.vstack((zrow.copy()
-                     ,np.column_stack((zcol.copy(), life, zcol.copy()))
-                     ,zrow.copy()))
+    return np.vstack((
+        zrow.copy(),
+        np.column_stack((zcol.copy(), life, zcol.copy())),
+        zrow.copy()
+    ))
 
 
 
@@ -49,11 +51,29 @@ def print_life(*lifes: Life, title: Optional[str] = None) -> None:
 
 
 
-def next_gen(oldL: Life) -> Life:
-    '''compute the GoL successor function with fixed size (rimcells have fewer neighbors)'''
+def next_gen(oldL: Life, geometry: str = 'rim') -> Life:
+    '''
+    compute the GoL successor function with a certain geometry
+
+    geometry == 'Hard Edges':      cells on the rim have fewer neighboors
+    geometry == 'Torus':    grid wraps around on the edges
+    '''
 
     newL = np.zeros(oldL.shape, dtype=np.int8)
-    oldL = pad(oldL)
+    if geometry == 'Hard Edges':
+        oldL = pad(oldL)
+    elif geometry == 'Torus':
+        top, bottom = oldL[0, :], oldL[-1, :]
+        tl, tr, bl, br = oldL[0, 0], oldL[0, -1], oldL[-1, 0], oldL[-1, -1]
+        oldL = np.column_stack((oldL[:, -1], oldL, oldL[:, 0]))
+        oldL = np.row_stack((
+            np.hstack((br, bottom, bl)),
+            oldL,
+            np.hstack((tr, top, tl))
+        ))
+    else:
+        raise Exception(f"No such geometry '{geometry}' is supported.")
+
     for r in range(1, oldL.shape[0] - 1):
         for c in range(1, oldL.shape[1] - 1):
             near = oldL[r-1 : r+2, c-1 : c+2].sum() - oldL[r, c]
@@ -63,7 +83,7 @@ def next_gen(oldL: Life) -> Life:
 
 
 
-def singleCellPredecessorsStrict() -> Dict[str, List[Life]]:
+def single_cell_predecessors() -> Dict[str, List[Life]]:
     '''compute all kind of predecessors of a single cell'''
 
     pre_on = []
@@ -157,7 +177,7 @@ def map2d(fun: Callable, mat: Life, n_type: Any = None) -> Life:
 
 
 def test_if_pre(preds: List[Life], goal: Life) -> int:
-    '''test if all pattern in preds are predecessors of goal'''
+    '''test if all pattern in preds are predecessors of goal and returns amount of false tests'''
 
     c = 0
     goal = pad(goal)
@@ -168,20 +188,22 @@ def test_if_pre(preds: List[Life], goal: Life) -> int:
 
 
 
-def run_gens(life: Life, gens: int, print_final: bool = False, print_all: bool = False) -> Life:
+def run_gens(life: Life, gens: int, geometry='Hard Edges', print_final: bool = False, print_all: bool = False) -> Life:
     '''compute a future generation'''
 
     for _ in range(gens):
         if print_all: print_life(life)
-        life = next_gen(life)
+        life = next_gen(life, geometry=geometry)
     if print_final: print_life(life)
     return life
 
 
 
 def avg_density(
-    size: Tuple[int, int], density: float,
-    n_gens: int, sample_size: int = 32
+    size: Tuple[int, int],
+    density: float,
+    n_gens: int,
+    sample_size: int = 32
 ) -> Tuple[float, float, float]:
     '''return (avg_density, lowest_density, highest_density)'''
 
