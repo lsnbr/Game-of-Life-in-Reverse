@@ -1,4 +1,12 @@
-import gol_tools as gol
+'''
+TODO
+- import export of life pattern
+- resizable
+- reversible
+'''
+
+
+from life_canvas import LifeCanvas
 
 import tkinter as tk
 import numpy as np
@@ -19,13 +27,12 @@ class GoLApp:
         self.root.title('Game of Life in Reverse')
         self.create_menubar()
 
-        self.cnv_life = self.create_canvas_life()
         self.controls_left = self.create_controls_left()
+        self.cnv_life_main = self.create_canvas_life()
 
-        self.cnv_life.grid(row=0, column=0)
+        self.cnv_life_main.grid(row=0, column=0)
         self.controls_left.grid(row=1, column=0, sticky='nswe')
 
-        self.update_life(gol.create_rnd(self.start_size, self.density))
         self.root.mainloop()
 
     
@@ -39,6 +46,18 @@ class GoLApp:
     @property
     def density(self) -> float:
         return min(1, max(0, self.var_density.get() / 100))
+
+    @property
+    def stepsize(self) -> int:
+        return self.scale_stepsize.get()
+
+    @property
+    def geometry(self) -> str:
+        return self.var_geometry.get()
+
+    @property
+    def loopspeed(self) -> int:
+        return self.scale_loopspeed.get()
 
 
     def create_menubar(self) -> None:
@@ -76,7 +95,7 @@ class GoLApp:
         self.btn_nextgen = tk.Button(
             master=frame_ctrl,
             text='Next Gen',
-            command=self.update_life,
+            command=lambda: self.cnv_life_main.next_gen(self.stepsize, self.geometry),
             pady=5, padx=5)
         self.btn_looplife = tk.Button(
             master=frame_ctrl,
@@ -86,12 +105,12 @@ class GoLApp:
         self.btn_clear = tk.Button(
             master=frame_ctrl,
             text='Clear',
-            command=lambda: self.update_life(np.zeros(self.start_size, dtype=np.int8)),
+            command=lambda: self.cnv_life_main.clean(self.start_size),
             pady=5, padx=5)
         self.btn_random = tk.Button(
             master=frame_ctrl,
             text='Random',
-            command=lambda: self.update_life(gol.create_rnd(self.start_size, self.density)),
+            command=lambda: self.cnv_life_main.random(self.start_size, self.density),
             pady=5, padx=5)
         self.btn_nextgen.grid  (row=0, column=0, sticky='we')
         self.btn_looplife.grid (row=0, column=1, sticky='we')
@@ -163,34 +182,13 @@ class GoLApp:
 
 
     def create_canvas_life(self) -> tk.Canvas:
-        cnv = tk.Canvas(
+        cnv = LifeCanvas(
             master=self.root,
             width=self.width,
             height=self.height,
         )
+        cnv.random(self.start_size, density=self.density)
         return cnv
-
-
-    def update_life(self, new_life: Optional[Life] = None) -> None:
-        if new_life is None:
-            self.life = gol.run_gens(
-                life=self.life,
-                gens=self.scale_stepsize.get(),
-                geometry=self.var_geometry.get()
-            )
-        else:
-            self.life = new_life
-        rows, cols = self.life.shape
-        cell_width, cell_height = self.width / cols, self.height / rows
-
-        self.cnv_life.delete(tk.ALL)
-        for r in range(rows):
-            for c in range(cols):
-                self.cnv_life.create_rectangle(
-                    r * cell_width,     c * cell_height,
-                    (r+1) * cell_width, (c+1) * cell_height,
-                    fill=['black', 'white'][self.life[r, c]],
-                )
 
 
     def control_loop_life(self) -> None:
@@ -205,8 +203,8 @@ class GoLApp:
 
     def loop_life(self) -> None:
         if self.is_in_loop:
-            self.update_life()
-            self.root.after(self.scale_loopspeed.get(), self.loop_life)
+            self.cnv_life_main.next_gen(step=self.stepsize, geometry=self.geometry)
+            self.root.after(self.loopspeed, self.loop_life)
 
 
 
