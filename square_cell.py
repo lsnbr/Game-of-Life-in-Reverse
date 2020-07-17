@@ -42,7 +42,7 @@ class SquareCell:
     @staticmethod
     def merge(
         pos: int, kind: str,
-        c1: SquareCell, c2: SquareCell,
+        c1: SquareCell,                  c2: SquareCell,
         c3: Optional[SquareCell] = None, c4: Optional[SquareCell] = None
     ) -> SquareCell:
         '''

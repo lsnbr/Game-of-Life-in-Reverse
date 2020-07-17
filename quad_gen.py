@@ -4,12 +4,12 @@ from gol_tools import *
 from square_cell import SquareCell
 from square_tree import SquareTree
 
-from typing import List
+from typing import List, Tuple
 Life = np.ndarray
 
 
 def quad_gen(goal: Life) -> List[Life]:
-    '''generalized verion of quad_2n()'''
+    '''generalized verion of quad_2n, works for mxn with 2 <= m,n'''
 
     # tree structure of pattern to merge
     tree = SquareTree(goal.shape)
@@ -19,7 +19,7 @@ def quad_gen(goal: Life) -> List[Life]:
     pre = single_cell_predecessors()
 
 
-    def tree_merge(twig, cord, pos):
+    def tree_merge(twig: SquareTree, cord: Tuple[int, int], pos: int) -> SquareCell:
         '''recursive merging according to tree structure of rectangles'''
         
         if twig.type == 'leaf':

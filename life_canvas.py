@@ -14,6 +14,8 @@ class LifeCanvas(tk.Canvas):
         super().__init__(**kwargs)
         if life is not None:
             self.life = life
+        self.max_width  = int(self['width'])
+        self.max_height = int(self['height'])
 
     @property
     def rows(self) -> int:
@@ -37,14 +39,27 @@ class LifeCanvas(tk.Canvas):
 
 
     def update(self, life: Life) -> None:
+        if self.rows > self.cols:
+            self.config(
+                width=round((self.max_height / self.rows) * self.cols),
+                height=self.max_height
+            )
+        elif self.cols > self.rows:
+            self.config(
+                width=self.max_width,
+                height=round((self.max_width / self.cols) * self.rows)
+            )
+        else:
+            self.config(width=self.max_width, height=self.max_height)
         cell_width  = int(self['width']) / self.cols
         cell_height = int(self['height']) / self.rows
+
         self.delete(tk.ALL)
         for r in range(self.rows):
             for c in range(self.cols):
                 self.create_rectangle(
-                    r * cell_width,     c * cell_height,
-                    (r+1) * cell_width, (c+1) * cell_height,
+                    c * cell_height,     r * cell_width,
+                    (c+1) * cell_height, (r+1) * cell_width,
                     fill=['black', 'white'][self.life[r, c]],
                 )
 

@@ -77,5 +77,5 @@ class SquareTree:
             return pad + f'\n{pad}'.join((str(self.shape), self.tl.to_str(nd), self.tr.to_str(nd)))
 
 
-    def __repr__(self) -> str:
+    def __str__(self) -> str:
         return self.to_str()

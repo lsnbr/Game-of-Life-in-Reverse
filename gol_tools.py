@@ -51,7 +51,7 @@ def print_life(*lifes: Life, title: Optional[str] = None) -> None:
 
 
 
-def next_gen(oldL: Life, geometry: str = 'rim') -> Life:
+def next_gen(oldL: Life, geometry: str = 'Hard Edges') -> Life:
     '''
     compute the GoL successor function with a certain geometry
 
