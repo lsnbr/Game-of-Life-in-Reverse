@@ -1,10 +1,8 @@
 '''
 todo:
 - resizable canvas
-- redo __str__ of squaretree class
+- proogress indicator / algorithm visualization
 - clickable cells
-- make reverser work for 1 width/height
-- reverse -> active option
 '''
 
 from life_canvas import LifeCanvas
@@ -12,8 +10,7 @@ from life_files import *
 from quad_gen import quad_gen
 
 import tkinter as tk
-from tkinter import filedialog
-from tkinter import messagebox
+from tkinter import filedialog, messagebox
 import numpy as np
 import os
 
@@ -96,8 +93,8 @@ class GoLApp:
 
 
     def reverse_life(self) -> None:
-        if self.cnv_life_main.rows not in range(2, 9) or self.cnv_life_main.cols not in range(2, 9):
-            messagebox.showerror(message='Reversing is only supported for\n2 <= rows <= 8\n2 <= cols <= 8')
+        if self.cnv_life_main.rows not in range(1, 9) or self.cnv_life_main.cols not in range(1, 9):
+            messagebox.showerror(message='Reversing is only supported for\n1 <= rows <= 8\n1 <= cols <= 8')
             return
         self.reversed_lifes = quad_gen(self.cnv_life_main.life)
         if self.reversed_lifes:
@@ -123,6 +120,8 @@ class GoLApp:
 
     def reverse_to_active(self) -> None:
         self.cnv_life_main.life = self.cnv_life_reverse.life
+        self.var_rows.set(self.cnv_life_main.rows)
+        self.var_cols.set(self.cnv_life_main.cols)
 
 
     def export_file(self) -> None:

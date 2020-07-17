@@ -55,8 +55,8 @@ def next_gen(oldL: Life, geometry: str = 'Hard Edges') -> Life:
     '''
     compute the GoL successor function with a certain geometry
 
-    geometry == 'Hard Edges':      cells on the rim have fewer neighboors
-    geometry == 'Torus':    grid wraps around on the edges
+    geometry == 'Hard Edges':   cells on the rim have fewer neighboors
+    geometry == 'Torus':        grid wraps around on the edges
     '''
 
     newL = np.zeros(oldL.shape, dtype=np.int8)
@@ -86,12 +86,12 @@ def next_gen(oldL: Life, geometry: str = 'Hard Edges') -> Life:
 def single_cell_predecessors() -> Dict[str, List[Life]]:
     '''compute all kind of predecessors of a single cell'''
 
-    pre_on = []
-    pre_off = []
-    pre_top_on = []
-    pre_top_off = []
-    pre_top_left_on = []
-    pre_top_left_off = []
+    on,                off                = [], []
+    top_on,            top_off            = [], []
+    top_left_on,       top_left_off       = [], []
+    top_left_right_on, top_left_right_off = [], []
+    top_down_on,       top_down_off       = [], []
+    center_on,         center_off         = [], []
 
     for i in range(512, 1024):
 
@@ -99,24 +99,54 @@ def single_cell_predecessors() -> Dict[str, List[Life]]:
         pat1 = next_gen(pat0)
 
         if pat1[1, 1]:
-            pre_on.append(pat0)
-            if not (pat1[0, 0] or pat1[0, 1] or pat1[0, 2]):
-                pre_top_on.append(pat0)
-                if not (pat1[1, 0] or pat1[2, 0]):
-                    pre_top_left_on.append(pat0)
-        else:
-            pre_off.append(pat0)
-            if not (pat1[0, 0] or pat1[0, 1] or pat1[0, 2]):
-                pre_top_off.append(pat0)
-                if not (pat1[1, 0] or pat1[2, 0]):
-                    pre_top_left_off.append(pat0)
+            on.append(pat0)
+            if pat1[0, 0] + pat1[0, 1] + pat1[0, 2] == 0:
+                top_on.append(pat0)
+                if pat1[2, 0] + pat1[2, 1] + pat1[2, 2] == 0:
+                    top_down_on.append(pat0)
+                if pat1[1, 0] + pat1[2, 0] == 0:
+                    top_left_on.append(pat0)
+                    if pat1[1, 2] + pat1[2, 2] == 0:
+                        top_left_right_on.append(pat0)
+                        if pat1[2, 1] == 0:
+                            center_on.append(pat0)
 
-    return {'on': pre_on, 'ont': pre_top_on, 'ontl': pre_top_left_on
-           ,'off': pre_off, 'offt': pre_top_off, 'offtl': pre_top_left_off
-           ,'ond': rot_twice(pre_top_on), 'onl': rot_counter(pre_top_on), 'onr': rot_clock(pre_top_on)
-           ,'offd': rot_twice(pre_top_off), 'offl': rot_counter(pre_top_off), 'offr': rot_clock(pre_top_off)
-           ,'ontr': rot_clock(pre_top_left_on), 'ondr': rot_twice(pre_top_left_on), 'ondl': rot_counter(pre_top_left_on)
-           ,'offtr': rot_clock(pre_top_left_off), 'offdr': rot_twice(pre_top_left_off), 'offdl': rot_counter(pre_top_left_off)}
+        else:
+            off.append(pat0)
+            if pat1[0, 0] + pat1[0, 1] + pat1[0, 2] == 0:
+                top_off.append(pat0)
+                if pat1[2, 0] + pat1[2, 1] + pat1[2, 2] == 0:
+                    top_down_off.append(pat0)
+                if pat1[1, 0] + pat1[2, 0] == 0:
+                    top_left_off.append(pat0)
+                    if pat1[1, 2] + pat1[2, 2] == 0:
+                        top_left_right_off.append(pat0)
+                        if pat1[2, 1] == 0:
+                            center_off.append(pat0)
+
+    return {
+        'on':     on,                             'off':     off,
+
+        'ont':    top_on,                         'offt':    top_off,
+        'ond':    rot_twice(top_on),              'offd':    rot_twice(top_off),
+        'onl':    rot_counter(top_on),            'offl':    rot_counter(top_off),
+        'onr':    rot_clock(top_on),              'offr':    rot_clock(top_off),
+
+        'ontl':   top_left_on,                    'offtl':   top_left_off,
+        'ontr':   rot_clock(top_left_on),         'offtr':   rot_clock(top_left_off),
+        'ondl':   rot_counter(top_left_on),       'offdl':   rot_counter(top_left_off),
+        'ondr':   rot_twice(top_left_on),         'offdr':   rot_twice(top_left_off),
+
+        'ontlr':  top_left_right_on,              'offtlr':  top_left_right_off,
+        'ondlr':  rot_twice(top_left_right_on),   'offdlr':  rot_twice(top_left_right_off),
+        'ontdl':  rot_counter(top_left_right_on), 'offtdl':  rot_counter(top_left_right_off),
+        'ontdr':  rot_clock(top_left_right_on),   'offtdr':  rot_clock(top_left_right_off),
+
+        'ontd':   top_down_on,                    'offtd':   top_down_off,
+        'onlr':   rot_clock(top_down_on),         'offlr':   rot_clock(top_down_off),
+        
+        'ontdlr': center_on,                      'offtdlr': center_off
+    }
 
 
 

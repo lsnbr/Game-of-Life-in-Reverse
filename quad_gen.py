@@ -9,7 +9,7 @@ Life = np.ndarray
 
 
 def quad_gen(goal: Life) -> List[Life]:
-    '''generalized verion of quad_2n, works for mxn with 2 <= m,n'''
+    '''generalized verion of quad_2n, works for mxn with 1 <= m,n'''
 
     # tree structure of pattern to merge
     tree = SquareTree(goal.shape)
@@ -24,8 +24,8 @@ def quad_gen(goal: Life) -> List[Life]:
         
         if twig.type == 'leaf':
             status = ['off', 'on'][goal[cord]]
-            row_pos = 't' if cord[0] == 0 else ('d' if cord[0] == height - 1 else '')
-            col_pos = 'l' if cord[1] == 0 else ('r' if cord[1] == width - 1 else '')
+            row_pos = ('t' if cord[0] == 0 else '') + ('d' if cord[0] == height - 1 else '')
+            col_pos = ('l' if cord[1] == 0 else '') + ('r' if cord[1] == width - 1 else '')
             return SquareCell(pre[status + row_pos + col_pos], pos)
 
         off_height, off_width = twig.tl.shape
