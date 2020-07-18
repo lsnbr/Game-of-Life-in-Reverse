@@ -1,5 +1,6 @@
 import numpy as np
 from random import random
+from math import inf
 
 from typing import (
     List, Tuple, Dict,
@@ -80,6 +81,21 @@ def next_gen(oldL: Life, geometry: str = 'Hard Edges') -> Life:
             if near == 3 or (near == 2 and oldL[r, c]):
                 newL[r-1, c-1] = 1
     return newL
+
+
+def shrink(life: Life) -> Life:
+    '''shrinks a pattern to the smallest bounding box'''
+
+    new_life = life
+    while 0 not in new_life.shape and new_life[0, :].sum() == 0:
+        new_life = new_life[1:, :]
+    while 0 not in new_life.shape and new_life[-1, :].sum() == 0:
+        new_life = new_life[:-1, :]
+    while 0 not in new_life.shape and new_life[:, 0].sum() == 0:
+        new_life = new_life[:, 1:]
+    while 0 not in new_life.shape and new_life[:, -1].sum() == 0:
+        new_life = new_life[:, :-1]
+    return np.zeros((1,1), dtype=np.int8) if 0 in new_life.shape else new_life.copy()
 
 
 
@@ -189,6 +205,68 @@ def down2(grid: Life) -> Life:
 
 def mid(grid: Life) -> Life:
     return grid[2:-2, 2:-2]
+
+
+
+def filter_least_cells(lifes: Iterable[Life]) -> List[Life]:
+    '''return all lifes that have the least amount of on cells'''
+
+    filtered = []
+    c_min = inf
+    for life in lifes:
+        c = life.sum()
+        if c < c_min:
+            filtered = [life]
+            c_min = c
+        elif c == c_min:
+            filtered.append(life)
+    return filtered
+
+
+
+def filter_most_cells(lifes: Iterable[Life]) -> List[Life]:
+    '''return all lifes that have the most amount of on cells'''
+
+    filtered = []
+    c_max = -inf
+    for life in lifes:
+        c = life.sum()
+        if c > c_max:
+            filtered = [life]
+            c_max = c
+        elif c == c_max:
+            filtered.append(life)
+    return filtered
+
+
+
+def bounding_box(life: Life) -> Tuple[int, int]:
+    '''return the size of the bounding box (rows x cols)'''
+
+    h, w = life.shape
+    r0, c0 = 0, 0 
+    r1, c1 = h - 1, w - 1
+    while r0 < h - 1 and life[r0, :].sum() == 0: r0 += 1
+    while r1 > 0     and life[r1, :].sum() == 0: r1 -= 1
+    while c0 < w - 1 and life[:, c0].sum() == 0: c0 += 1
+    while c1 > 0     and life[:, c1].sum() == 0: c1 -= 1
+    return max(1, r1 - r0 + 1), max(1, c1 - c0 + 1)
+
+
+def filter_bounding_box(lifes: Iterable[Life]) -> List[Life]:
+    '''return all lifes with the smallest bounding box'''
+
+    filtered = []
+    bb_min = inf
+    for life in lifes:
+        r, c = bounding_box(life)
+        bb = r * c
+        if bb < bb_min:
+            filtered = [life]
+            bb_min = bb
+        elif bb == bb_min:
+            filtered.append(life)
+    return filtered
 
 
 

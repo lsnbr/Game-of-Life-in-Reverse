@@ -1,20 +1,21 @@
 '''
 todo:
 - resizable canvas
-- proogress indicator / algorithm visualization
-- clickable cells
+- proogress indicator / algorithm visualization / log-life switch
+- life 1.05 format
 '''
 
 from life_canvas import LifeCanvas
 from life_files import *
 from quad_gen import quad_gen
+import gol_tools as gol
 
 import tkinter as tk
 from tkinter import filedialog, messagebox
 import numpy as np
 import os
 
-from typing import Optional, Tuple
+from typing import Optional, Tuple, List
 Life = np.ndarray
 
 
@@ -32,7 +33,6 @@ class GoLApp:
 
         self.root = tk.Tk()
         self.root.title('Game of Life in Reverse')
-        self.create_menubar()
 
         self.controls_left    = self.create_controls_left()
         self.cnv_life_main    = self.create_life_main()
@@ -49,6 +49,7 @@ class GoLApp:
         self.cnv_life_reverse.grid (row=0, column=1, sticky='nswe')
         self.controls_right.grid   (row=1, column=1, sticky='ns'  , padx=5, pady=2)
 
+        self.create_menubar()
         self.root.mainloop()
 
     
@@ -75,6 +76,28 @@ class GoLApp:
     def loopspeed(self) -> int:
         return self.scale_loopspeed.get()
 
+    @property
+    def reversed_lifes(self) -> List[Life]:
+        if not hasattr(self, '_reversed_lifes'):
+            self.reversed_lifes = []
+        return self._reversed_lifes
+
+    @reversed_lifes.setter
+    def reversed_lifes(self, lifes: List[Life]) -> None:
+        self._reversed_lifes = lifes
+        if self.reversed_lifes:
+            self.cnv_life_reverse.life = self.reversed_lifes[0]
+        else:
+            self.cnv_life_reverse.delete(tk.ALL)
+
+        self.reversed_amount = len(self.reversed_lifes)
+        self.var_reverse_count.set(1 if self.reversed_amount > 0 else 0)
+        self.label_reverse.config(text=f'{self.reversed_amount} predecessors found.')
+        self.spinbox_reverse.config(
+            from_= 1 if self.reversed_amount > 0 else 0,
+            to=self.reversed_amount
+        )
+
 
     def control_loop_life(self) -> None:
         if self.is_in_loop:
@@ -93,33 +116,31 @@ class GoLApp:
 
 
     def reverse_life(self) -> None:
-        if self.cnv_life_main.rows not in range(1, 9) or self.cnv_life_main.cols not in range(1, 9):
-            messagebox.showerror(message='Reversing is only supported for\n1 <= rows <= 8\n1 <= cols <= 8')
+        if self.cnv_life_main.rows not in range(1, 17) or self.cnv_life_main.cols not in range(1, 17):
+            messagebox.showerror(message='Reversing is only supported for\n1 <= rows <= 16\n1 <= cols <= 16')
             return
         self.reversed_lifes = quad_gen(self.cnv_life_main.life)
-        if self.reversed_lifes:
-            self.cnv_life_reverse.life = self.reversed_lifes[0]
-        else:
-            self.cnv_life_reverse.delete(tk.ALL)
-
-        self.var_reverse_count.set(1)
-        self.reversed_amount = len(self.reversed_lifes)
-        self.label_reverse.config(text=f'{self.reversed_amount} predecessors found.')
-        self.spinbox_reverse.config(
-            from_= 1 if self.reversed_amount > 0 else 0,
-            to=self.reversed_amount
-        )
 
 
     def update_cnv_reversed(self, *_, **__) -> None:
         if not self.reversed_lifes:
-            self.update_cnv_reversed.delete(tk.ALL)
-        n = min(self.reversed_amount, max(1, self.var_reverse_count.get()))
-        self.cnv_life_reverse.life = self.reversed_lifes[n - 1]
+            self.cnv_life_reverse.delete(tk.ALL)
+        else:
+            n = min(self.reversed_amount, max(1, self.var_reverse_count.get()))
+            self.cnv_life_reverse.life = self.reversed_lifes[n - 1]
 
 
     def reverse_to_active(self) -> None:
-        self.cnv_life_main.life = self.cnv_life_reverse.life
+        try:
+            self.cnv_life_main.life = self.cnv_life_reverse.life
+            self.var_rows.set(self.cnv_life_main.rows)
+            self.var_cols.set(self.cnv_life_main.cols)
+        except:
+            pass
+
+
+    def shrink_life(self) -> None:
+        self.cnv_life_main.shrink()
         self.var_rows.set(self.cnv_life_main.rows)
         self.var_cols.set(self.cnv_life_main.cols)
 
@@ -161,6 +182,17 @@ class GoLApp:
             self.cnv_life_main.life = new_life
 
 
+    def filter_reversed(self, f: str) -> None:
+        if   f == 'Fewest Alive Cells':
+            self.reversed_lifes = gol.filter_least_cells(self.reversed_lifes)
+        elif f == 'Most Alive Cells':
+            self.reversed_lifes = gol.filter_most_cells(self.reversed_lifes)
+        elif f == 'Smallest Bounding Box':
+            self.reversed_lifes = gol.filter_bounding_box(self.reversed_lifes)
+        else:
+            raise Exception(f'No such filter option \'{f}\' is supported.')
+
+
     def create_life_main(self) -> LifeCanvas:
         cnv = LifeCanvas(
             master=self.root,
@@ -168,6 +200,7 @@ class GoLApp:
             height=self.height,
         )
         cnv.random(self.start_size, density=self.density)
+        cnv.make_clickable()
         return cnv
 
     
@@ -208,6 +241,18 @@ class GoLApp:
         # Edit Menu
         self.menu_edit = tk.Menu(master=self.menu, tearoff=0)
         self.menu_edit.add_command(label='Reversed -> Active', command=self.reverse_to_active)
+        self.menu_edit.add_command(label='Shrink Pattern', command=self.shrink_life)
+        self.menu_filter = tk.Menu(master=self.menu_edit, tearoff=0)
+        self.menu_filter.add_command(
+            label='Fewest Alive Cells',
+            command=lambda: self.filter_reversed('Fewest Alive Cells'))
+        self.menu_filter.add_command(
+            label='Most Alive Cells',
+            command=lambda: self.filter_reversed('Most Alive Cells'))
+        self.menu_filter.add_command(
+            label='Smallest Bounding Box',
+            command=lambda: self.filter_reversed('Smallest Bounding Box'))
+        self.menu_edit.add_cascade(label='Filter Results', menu=self.menu_filter)
 
         # Build main menu
         self.menu.add_cascade(label='File', menu=self.menu_file)
@@ -345,8 +390,6 @@ class GoLApp:
             command=self.reverse_life,
             pady=5, padx=5)
 
-        self.reversed_lifes = []
-        self.reversed_amount = 0
         self.var_reverse_count = tk.IntVar()
         self.var_reverse_count.set(0)
         self.var_reverse_count.trace('w', self.update_cnv_reversed)
@@ -360,12 +403,18 @@ class GoLApp:
 
         self.label_reverse = tk.Label(
             master=frame_ctrl,
-            text='No predecessors calculated yet.'
+            text='No predecessors calculated yet.',
         )
             
-        self.btn_reverse.grid     (row=0, column=0, sticky='nswe', padx=5)
-        self.spinbox_reverse.grid (row=0, column=1, sticky='nswe', padx=5)
-        self.label_reverse.grid   (row=0, column=2, sticky='nswe', padx=5)
+        self.btn_reverse.grid     (row=0, column=0, sticky='nwe', padx=5)
+        self.spinbox_reverse.grid (row=0, column=1, sticky='nwe', padx=5, ipady=7)
+        self.label_reverse.grid   (row=0, column=2, sticky='nwe', padx=5)
+
+        # Final row and column config
+        for r in range(1):
+            frame_ctrl.rowconfigure(r, weight=1)
+        for c in range(3):
+            frame_ctrl.columnconfigure(c, weight=1)
 
         return frame_ctrl
 

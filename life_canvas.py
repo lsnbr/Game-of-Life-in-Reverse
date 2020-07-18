@@ -9,6 +9,7 @@ Life = np.ndarray
 
 
 class LifeCanvas(tk.Canvas):
+    '''A tk.Canvas that stores and displays a GoL Pattern'''
 
     def __init__(self, life: Optional[Life] = None, **kwargs) -> None:
         super().__init__(**kwargs)
@@ -36,6 +37,20 @@ class LifeCanvas(tk.Canvas):
     def life(self, life: Life) -> None:
         self._life = life
         self.update(self._life)
+
+
+    def make_clickable(self) -> None:
+        self.bind('<Button-1>', self.on_click)
+
+
+    def on_click(self, event) -> None:
+        x, y = self.canvasx(event.x), self.canvasy(event.y)
+        row = int(y // (int(self['height']) / self.rows))
+        col = int(x // (int(self['width']) / self.cols))
+
+        new_life = self.life
+        new_life[row, col] = 1 - new_life[row, col]
+        self.life = new_life
 
 
     def update(self, life: Life) -> None:
@@ -70,6 +85,10 @@ class LifeCanvas(tk.Canvas):
 
     def clean(self, size: Tuple[int, int]) -> None:
         self.life = np.zeros(size, dtype=np.int8)
+
+
+    def shrink(self) -> None:
+        self.life = gol.shrink(self.life)
 
 
     def next_gen(self, step: int = 1, geometry: str = 'Hard Edges') -> None:
