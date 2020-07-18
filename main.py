@@ -7,7 +7,7 @@ todo:
 
 from life_canvas import LifeCanvas
 from life_files import *
-from quad_gen import quad_gen
+from reverse_quad_gen import quad_gen
 import gol_tools as gol
 
 import tkinter as tk
@@ -149,8 +149,8 @@ class GoLApp:
         with filedialog.asksaveasfile(
             mode='w',
             initialdir=os.getcwd(),
-            defaultextension=GoLApp.filetypes,
-            filetypes=GoLApp.filetypes
+            defaultextension=GoLApp.filetypes[:1],
+            filetypes=GoLApp.filetypes[:1]
         ) as file:
 
             ext = os.path.splitext(file.name)[1]
