@@ -421,4 +421,5 @@ class GoLApp:
 
 
 
-app = GoLApp()
+if __name__ == '__main__':
+    app = GoLApp()
